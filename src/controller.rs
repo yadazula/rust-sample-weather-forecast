@@ -1,16 +1,19 @@
+use crate::error::AppError;
+use crate::model::{
+    City, GeoResponse, IndexTemplate, LatLong, StatsTemplate, WeatherDisplayTemplate, WeatherQuery,
+    WeatherResponse,
+};
+use anyhow::Context;
 use axum::extract::{Query, State};
 use sqlx::PgPool;
-use anyhow::Context;
-use crate::error::AppError;
-use crate::model::{City, GeoResponse, IndexTemplate, LatLong, StatsTemplate, WeatherDisplayTemplate, WeatherQuery, WeatherResponse};
 
 async fn get_lat_long(pool: &PgPool, name: &str) -> Result<LatLong, anyhow::Error> {
     let lat_long = sqlx::query_as::<_, LatLong>(
         "SELECT lat AS latitude, long AS longitude FROM cities WHERE name = $1",
     )
-        .bind(name)
-        .fetch_optional(pool)
-        .await?;
+    .bind(name)
+    .fetch_optional(pool)
+    .await?;
 
     if let Some(lat_long) = lat_long {
         return Ok(lat_long);
@@ -41,14 +44,19 @@ async fn fetch_weather(lat_long: LatLong) -> Result<WeatherResponse, anyhow::Err
         "https://api.open-meteo.com/v1/forecast?latitude={}&longitude={}&hourly=temperature_2m",
         lat_long.latitude, lat_long.longitude
     );
-    let response = reqwest::get(&endpoint).await?.json::<WeatherResponse>().await?;
+    let response = reqwest::get(&endpoint)
+        .await?
+        .json::<WeatherResponse>()
+        .await?;
     Ok(response)
 }
 
 async fn get_last_cities(pool: &PgPool) -> Result<Vec<City>, AppError> {
-    let cities = sqlx::query_as::<_, City>("SELECT name, lat AS latitude, long AS longitude FROM cities ORDER BY id DESC LIMIT 10")
-        .fetch_all(pool)
-        .await?;
+    let cities = sqlx::query_as::<_, City>(
+        "SELECT name, lat AS latitude, long AS longitude FROM cities ORDER BY id DESC LIMIT 10",
+    )
+    .fetch_all(pool)
+    .await?;
     Ok(cities)
 }
 

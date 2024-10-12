@@ -1,10 +1,10 @@
-mod model;
-mod error;
 mod controller;
+mod error;
+mod model;
 
+use crate::controller::{index, stats, weather};
 use anyhow::Context;
 use axum::{routing::get, Router};
-use crate::controller::{index, stats, weather};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -22,8 +22,7 @@ async fn main() -> anyhow::Result<()> {
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await?;
 
-    axum::serve(listener, app)
-        .await?;
+    axum::serve(listener, app).await?;
 
     Ok(())
 }
