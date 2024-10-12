@@ -102,6 +102,8 @@ pub struct LatLong {
 #[derive(sqlx::FromRow, Deserialize, Debug, Clone)]
 pub struct City {
     pub name: String,
+    pub latitude: f64,
+    pub longitude: f64,
 }
 
 #[derive(Template)]
@@ -152,7 +154,7 @@ async fn fetch_weather(lat_long: LatLong) -> Result<WeatherResponse, anyhow::Err
 }
 
 async fn get_last_cities(pool: &PgPool) -> Result<Vec<City>, AppError> {
-    let cities = sqlx::query_as::<_, City>("SELECT name FROM cities ORDER BY id DESC LIMIT 10")
+    let cities = sqlx::query_as::<_, City>("SELECT name, lat AS latitude, long AS longitude FROM cities ORDER BY id DESC LIMIT 10")
         .fetch_all(pool)
         .await?;
     Ok(cities)

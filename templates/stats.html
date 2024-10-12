@@ -10,12 +10,16 @@
     <thead>
     <tr>
         <th>Name</th>
+        <th>Lat</th>
+        <th>Long</th>
     </tr>
     </thead>
     <tbody>
     {% for city in cities %}
     <tr>
         <td>{{ city.name }}</td>
+        <td>{{ city.latitude }}</td>
+        <td>{{ city.longitude }}</td>
     </tr>
     {% endfor %}
     </tbody>
