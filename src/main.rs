@@ -1,8 +1,8 @@
-mod controller;
-mod error;
-mod model;
+mod controllers;
+mod models;
 
-use crate::controller::{index, stats, weather};
+use crate::controllers::stats::*;
+use crate::controllers::weather::*;
 use anyhow::Context;
 use axum::{routing::get, Router};
 

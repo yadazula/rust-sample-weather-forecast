@@ -56,27 +56,3 @@ impl WeatherDisplayTemplate {
         display
     }
 }
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct GeoResponse {
-    pub results: Vec<LatLong>,
-}
-
-#[derive(sqlx::FromRow, Serialize, Deserialize, Debug, Clone)]
-pub struct LatLong {
-    pub latitude: f64,
-    pub longitude: f64,
-}
-
-#[derive(sqlx::FromRow, Serialize, Deserialize, Debug, Clone)]
-pub struct City {
-    pub name: String,
-    pub latitude: f64,
-    pub longitude: f64,
-}
-
-#[derive(Template)]
-#[template(path = "stats.html")]
-pub struct StatsTemplate {
-    pub cities: Vec<City>,
-}
