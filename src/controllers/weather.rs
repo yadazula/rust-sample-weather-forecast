@@ -6,6 +6,7 @@ use crate::models::weather::{
 use anyhow::Context;
 use axum::extract::{Query, State};
 use sqlx::PgPool;
+use tracing::debug;
 
 pub async fn index() -> IndexTemplate {
     IndexTemplate
@@ -21,6 +22,7 @@ pub async fn weather(
 }
 
 async fn get_lat_long(pool: &PgPool, name: &str) -> Result<LatLong, anyhow::Error> {
+    debug!("Checking if city is already in database for city: {}", name);
     let lat_long = sqlx::query_as::<_, LatLong>(
         "SELECT lat AS latitude, long AS longitude FROM cities WHERE name = $1",
     )
@@ -29,6 +31,7 @@ async fn get_lat_long(pool: &PgPool, name: &str) -> Result<LatLong, anyhow::Erro
     .await?;
 
     if let Some(lat_long) = lat_long {
+        debug!("City found in database, returning lat/long: {:?}", lat_long);
         return Ok(lat_long);
     }
 
@@ -40,6 +43,10 @@ async fn get_lat_long(pool: &PgPool, name: &str) -> Result<LatLong, anyhow::Erro
         .execute(pool)
         .await?;
 
+    debug!(
+        "City not found in database, fetched from API: {:?}",
+        lat_long
+    );
     Ok(lat_long)
 }
 
@@ -48,7 +55,11 @@ async fn fetch_lat_long(city: &str) -> Result<LatLong, anyhow::Error> {
         "https://geocoding-api.open-meteo.com/v1/search?name={}&count=1&language=en&format=json",
         city
     );
+
+    debug!("Fetching lat/long for city: {}", city);
     let response = reqwest::get(&endpoint).await?.json::<GeoResponse>().await?;
+    debug!("Fetch response: {:?}", response);
+
     response.results.get(0).cloned().context("No results found")
 }
 
@@ -57,9 +68,12 @@ async fn fetch_weather(lat_long: LatLong) -> Result<WeatherResponse, anyhow::Err
         "https://api.open-meteo.com/v1/forecast?latitude={}&longitude={}&hourly=temperature_2m",
         lat_long.latitude, lat_long.longitude
     );
+
+    debug!("Fetching weather for lat/long: {:?}", lat_long);
     let response = reqwest::get(&endpoint)
         .await?
         .json::<WeatherResponse>()
         .await?;
+
     Ok(response)
 }
