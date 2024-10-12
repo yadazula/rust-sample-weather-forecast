@@ -1,0 +1,24 @@
+services:
+  app:
+    container_name: rust-weather-forecast
+    image: rust-weather-forecast:1.0.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DATABASE_URL: postgres://forecast:forecast@db:5432/forecast?sslmode=disable
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+  db:
+    container_name: db
+    image: postgres
+    environment:
+      POSTGRES_USER: forecast
+      POSTGRES_PASSWORD: forecast
+      POSTGRES_DB: forecast
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/index.sql
