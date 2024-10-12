@@ -1,0 +1,24 @@
+[package]
+name = "forecast"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.89"
+askama = { version = "0.12.1", features = ["with-axum"] }
+askama_axum = "0.4.0"
+# web framework
+axum = "0.7.7"
+# async HTTP client
+reqwest = { version = "0.12.8", features = ["json"] }
+# serialization/deserialization  for JSON
+serde = "1.0.188"
+# database access
+sqlx = { version = "0.8.2", features = [
+    "runtime-tokio-rustls",
+    "macros",
+    "any",
+    "postgres",
+] }
+# async runtime
+tokio = { version = "1.32.0", features = ["full"] }
