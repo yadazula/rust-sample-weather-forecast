@@ -10,17 +10,13 @@ use axum::Router;
 use dotenv::dotenv;
 use tower_http::trace::TraceLayer;
 use tracing::debug;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv().ok();
 
-    // Setup tracing subscriber to log all logs with level DEBUG or higher
-    tracing_subscriber::registry()
-        .with(EnvFilter::from_default_env().add_directive(tracing::Level::DEBUG.into()))
-        .with(tracing_subscriber::fmt::layer())
-        .init();
+    // Configure the default `tracing` subscriber.
+    tracing_subscriber::fmt::init();
 
     let db_connection_str = std::env::var("DATABASE_URL").context("DATABASE_URL must be set")?;
 
