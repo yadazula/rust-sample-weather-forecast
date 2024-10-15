@@ -60,7 +60,7 @@ async fn fetch_lat_long(city: &str) -> Result<LatLong, anyhow::Error> {
     let response = reqwest::get(&endpoint).await?.json::<GeoResponse>().await?;
     debug!("Fetch response: {:?}", response);
 
-    response.results.get(0).cloned().context("No results found")
+    response.results.first().cloned().context("No results found")
 }
 
 async fn fetch_weather(lat_long: LatLong) -> Result<WeatherResponse, anyhow::Error> {
