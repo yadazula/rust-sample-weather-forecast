@@ -7,12 +7,15 @@ use anyhow::Context;
 use axum::extract::{MatchedPath, Request};
 use axum::routing::get;
 use axum::Router;
+use dotenv::dotenv;
 use tower_http::trace::TraceLayer;
 use tracing::debug;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    dotenv().ok();
+
     // Setup tracing subscriber to log all logs with level DEBUG or higher
     tracing_subscriber::registry()
         .with(EnvFilter::from_default_env().add_directive(tracing::Level::DEBUG.into()))
